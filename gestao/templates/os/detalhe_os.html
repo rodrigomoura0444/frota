@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card shadow-lg p-5 bg-white">
+    <div class="d-flex justify-content-between border-bottom pb-4 mb-4">
+        <div>
+            <h1 class="fw-bold mb-0">ORDEM DE SERVIÇO</h1>
+            <h4 class="text-muted">Nº #{{ os.numero_os }}</h4>
+        </div>
+        <div class="text-end">
+            <div class="badge bg-dark fs-5 p-2 mb-2">{{ os.get_status_display|upper }}</div>
+            <p class="mb-0">Abertura: {{ os.data_abertura|date:"d/m/Y" }}</p>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-6">
+            <h6 class="text-uppercase fw-bold text-warning">Viatura</h6>
+            <p class="fs-5 mb-0"><strong>{{ os.veiculo.placa }}</strong></p>
+            <p>{{ os.veiculo.marca }} {{ os.veiculo.modelo }}</p>
+            <p class="text-muted">Proprietário: {{ os.veiculo.proprietario }}</p>
+        </div>
+        <div class="col-6 text-end">
+            <h6 class="text-uppercase fw-bold text-warning">Intervenção</h6>
+            <p class="fs-5 mb-0"><strong>{{ os.get_tipo_servico_display }}</strong></p>
+            <p>Horas Previstas: {{ os.horas_mao_obra }}h</p>
+        </div>
+    </div>
+
+    <div class="bg-light p-4 rounded mb-4">
+        <h6 class="fw-bold text-uppercase small text-muted">Avaria / Solicitação</h6>
+        <p class="lead mb-0">"{{ os.descricao_avaria }}"</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <h6 class="fw-bold border-bottom pb-2">Diagnóstico Técnico</h6>
+            <p>{{ os.diagnostico_tecnico|default:"A aguardar análise técnica." }}</p>
+        </div>
+        <div class="col-md-6">
+            <h6 class="fw-bold border-bottom pb-2">Peças e Materiais</h6>
+            <p>{{ os.pecas_aplicadas|default:"Nenhuma peça registada." }}</p>
+        </div>
+    </div>
+
+    <div class="d-none d-print-block mt-5 pt-5">
+        <div class="row text-center">
+            <div class="col-6"><p class="border-top pt-2">O Responsável Técnico</p></div>
+            <div class="col-6"><p class="border-top pt-2">Assinatura do Cliente</p></div>
+        </div>
+    </div>
+
+    <div class="card-footer bg-white text-center no-print mt-4">
+        <button onclick="window.print()" class="btn btn-warning btn-lg px-5 fw-bold shadow">
+            <i class="fas fa-print me-2"></i>GERAR PDF / IMPRIMIR
+        </button>
+        <a href="{% url 'lista_os' %}" class="btn btn-outline-secondary btn-lg px-4 ms-2">VOLTAR</a>
+    </div>
+</div>
+{% endblock %}

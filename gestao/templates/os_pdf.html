@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: a4;
+            margin: 1.5cm;
+            margin-bottom: 5cm; /* Reservamos espaço para a assinatura no rodapé */
+            
+            @frame footer_frame {
+                -pdf-frame-content: footer_content;
+                left: 1.5cm; 
+                width: 18cm; 
+                top: 24.5cm; /* Posiciona no final da folha */
+                height: 4cm;
+            }
+        }
+        
+        body { 
+            font-family: Helvetica, Arial, sans-serif; 
+            color: #333; 
+            font-size: 11px;
+        }
+
+        /* Estrutura do Cabeçalho */
+        .header-table {
+            width: 100%;
+            border-bottom: 2px solid #333;
+            margin-bottom: 20px;
+        }
+        .header-table td {
+            border: none;
+            padding-bottom: 10px;
+            vertical-align: middle;
+        }
+        .company-details {
+            text-align: right;
+            line-height: 1.2;
+        }
+        .os-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+            color: #000;
+        }
+
+        /* Estilo das Secções */
+        .section-title { 
+            background: #f2f2f2; 
+            padding: 6px; 
+            font-weight: bold; 
+            margin-top: 15px; 
+            border-left: 4px solid #333;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 7px; text-align: left; }
+        th { background-color: #f8f8f8; }
+        
+        .total-box { 
+            margin-top: 20px; 
+            text-align: right; 
+            padding-top: 10px; 
+        }
+        .total-line { 
+            font-size: 1.3em; 
+            font-weight: bold; 
+            background: #333;
+            color: #fff;
+            padding: 5px 10px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* Rodapé Estático */
+        #footer_content {
+            text-align: left;
+        }
+        .signature-line {
+            border-top: 1px solid #333;
+            width: 250px; /* Largura da linha de assinatura */
+            padding-top: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <table class="header-table">
+        <tr>
+            <td style="width: 50%;">
+                <div class="os-title">ORDEM DE SERVIÇO</div>
+                <div style="font-size: 14px; color: #555;"># {{ os.numero_os }}</div>
+            </td>
+            <td class="company-details">
+                <strong>Oficina Rodrigos Frota</strong><br>
+                Braga, Portugal<br>
+                Contacto: +351 9xx xxx xxx<br>
+                E-mail: geral@oficina.pt
+            </td>
+        </tr>
+    </table>
+
+    <table style="border: none; margin-bottom: 10px;">
+        <tr>
+            <td style="border: none; width: 60%;">
+                <strong>Viatura:</strong> {{ os.veiculo }}<br>
+                <strong>Data:</strong> {{ os.data_abertura|date:"d/m/Y H:i" }}
+            </td>
+            <td style="border: none; width: 40%; text-align: right;">
+                <strong>Estado:</strong> {{ os.get_status_display }}
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-title">DIAGNÓSTICO TÉCNICO</div>
+    <div style="padding: 10px 5px;">
+        {{ os.diagnostico_tecnico|default:"Nenhum diagnóstico registado."|linebreaks }}
+    </div>
+
+    <div class="section-title">PEÇAS E MATERIAIS</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Peça</th>
+                <th style="width: 40px;">Qtd</th>
+                <th style="width: 80px;">Unitário</th>
+                <th style="width: 80px;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for peca in os.pecas.all %}
+            <tr>
+                <td>{{ peca.nome_peca }}</td>
+                <td>{{ peca.quantidade }}</td>
+                <td>{{ peca.preco_unitario|floatformat:2 }}€</td>
+                <td>{{ peca.valor_total|floatformat:2 }}€</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="text-align:center;">Sem peças registadas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">MÃO DE OBRA</div>
+    <table>
+        <tr>
+            <td><strong>Tempo:</strong> {{ os.horas_mao_de_obra|floatformat:2 }}h</td>
+            <td><strong>Preço/Hora:</strong> {{ os.valor_hora|floatformat:2 }}€</td>
+            <td style="text-align:right;"><strong>Subtotal M.O.:</strong> {{ os.total_mao_de_obra|floatformat:2 }}€</td>
+        </tr>
+    </table>
+
+    <div class="total-box">
+        <p style="margin: 2px;">Total Peças: {{ os.total_pecas|floatformat:2 }}€</p>
+        <p style="margin: 2px;">Total Mão de Obra: {{ os.total_mao_de_obra|floatformat:2 }}€</p>
+        <div class="total-line">TOTAL A PAGAR: {{ os.total_geral|floatformat:2 }}€</div>
+    </div>
+
+    <div id="footer_content">
+        <div class="signature-line">
+            <strong>Assinatura do Técnico</strong><br>
+            <small>(Oficina Rodrigos Frota)</small>
+        </div>
+        <div style="margin-top: 30px; font-size: 9px; color: #999; text-align: center;">
+            Documento gerado eletronicamente em {% now "d/m/Y H:i" %} | Pág. <pdf:pagenumber>
+        </div>
+    </div>
+</body>
+</html>

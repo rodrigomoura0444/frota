@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold">Base de Dados: Clientes e Frotas</h3>
+    <p class="text-muted">Lista de proprietários associados a veículos ativos no sistema.</p>
+</div>
+
+<div class="row g-4">
+    {% for v in veiculos %}
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-0">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary text-white rounded-circle p-3 me-3">
+                        <i class="fas fa-user fa-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold">{{ v.proprietario }}</h5>
+                        <small class="text-muted">ID Cliente: #{{ v.id }}</small>
+                    </div>
+                </div>
+                <div class="bg-light p-3 rounded">
+                    <h6 class="fw-bold mb-2">Viatura Associada:</h6>
+                    <p class="mb-1 text-uppercase"><strong>{{ v.placa }}</strong></p>
+                    <p class="mb-0 small text-muted">{{ v.marca }} {{ v.modelo }}</p>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-3">
+                <a href="/admin/gestao/veiculo/{{ v.id }}/change/" class="btn btn-sm btn-outline-primary w-100">Editar Perfil</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

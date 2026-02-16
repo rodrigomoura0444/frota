@@ -1,0 +1,26 @@
+site_name: Frota Pro Documentation
+
+theme:
+  name: material
+  logo: assets/logo.png    # <--- Adiciona esta linha
+  favicon: assets/logo.png # <--- Opcional: ícone na aba do browser
+  palette:
+    scheme: slate
+    primary: indigo
+  features:
+    - navigation.expand
+    - content.code.copy
+    - navigation.top        # Adiciona um botão "voltar ao topo"
+
+
+markdown_extensions:
+  - pymdownx.superfences
+  - admonition
+  - attr_list
+
+nav:
+  - Visão Geral: index.md
+  - Modelagem de Dados: modelos_dados.md
+  - Dashboard & BI: dashboard.md
+  - Relatórios PDF: ordens_servico.md
+  - Segurança: seguranca.md

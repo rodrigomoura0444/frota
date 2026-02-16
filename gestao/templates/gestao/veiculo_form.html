@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-dark text-white p-4">
+                <h4 class="mb-0 fw-bold"><i class="fas fa-plus-circle me-2 text-warning"></i>Adicionar Nova Viatura</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" class="needs-validation">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        {% for field in form %}
+                        <div class="col-md-{% if field.name == 'placa' or field.name == 'ano' %}6{% else %}12{% endif %}">
+                            <label class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text small">{{ field.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-5 d-flex gap-2">
+                        <button type="submit" class="btn btn-warning px-5 fw-bold shadow-sm">Guardar Viatura</button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary px-4">Voltar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

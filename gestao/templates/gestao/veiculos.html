@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card card-stats bg-white p-4 shadow-sm">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 bg-primary text-white p-3 rounded-circle me-3">
+                    <i class="fas fa-file-invoice fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Total de Ordens</h6>
+                    <h2 class="fw-bold mb-0">{{ stats.total_os }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-stats bg-white p-4 shadow-sm">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 bg-warning text-dark p-3 rounded-circle me-3">
+                    <i class="fas fa-wrench fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Em Reparação</h6>
+                    <h2 class="fw-bold mb-0">{{ stats.em_reparacao }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-stats bg-white p-4 shadow-sm">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 bg-danger text-white p-3 rounded-circle me-3">
+                    <i class="fas fa-bell fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Alertas Críticos</h6>
+                    <h2 class="fw-bold mb-0">{{ stats.criticos }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">Frota de Viaturas</h4>
+        <a href="/admin/gestao/veiculo/add/" class="btn btn-primary rounded-pill px-4 shadow">
+            <i class="fas fa-plus me-2"></i>Registar Viatura
+        </a>
+    </div>
+
+    {% include 'partials/tabela_veiculos.html' %}
+</div>
+{% endblock %}

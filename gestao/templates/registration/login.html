@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-dark text-white text-center py-4">
+                <i class="fas fa-truck-pickup fa-3x text-warning mb-2"></i>
+                <h3 class="fw-bold mb-0">FROTA
+
+                    
+                </h3>
+                <small class="text-warning text-uppercase ls-1">Painel de Gestão</small>
+            </div>
+            <div class="card-body p-5">
+                {% if form.errors %}
+                    <div class="alert alert-danger small py-2">
+                        <i class="fas fa-exclamation-circle me-2"></i>Utilizador ou password incorretos.
+                    </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label small fw-bold text-muted">Utilizador</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
+                            <input type="text" name="username" id="id_username" class="form-control border-start-0 bg-light" placeholder="Nome de utilizador" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label small fw-bold text-muted">Palavra-passe</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-key text-muted"></i></span>
+                            <input type="password" name="password" id="id_password" class="form-control border-start-0 bg-light" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100 py-2 fw-bold shadow-sm">
+                        ENTRAR NO SISTEMA <i class="fas fa-sign-in-alt ms-2"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="card-footer bg-light text-center py-3 border-0">
+                <p class="mb-0 small text-muted">Acesso restrito a administradores e técnicos.</p>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="/admin/password_reset/" class="text-decoration-none small text-secondary">Esqueceu-se da password?</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ls-1 { letter-spacing: 2px; }
+    .input-group-text { border-color: #dee2e6; }
+    .form-control:focus { box-shadow: none; border-color: #ffc107; }
+</style>
+{% endblock %}

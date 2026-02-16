@@ -1,0 +1,51 @@
+<div class="table-custom p-4">
+    <h5 class="fw-bold mb-4">Monitorização em Tempo Real</h5>
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Viatura</th>
+                <th>KM Atual</th>
+                <th>Estado Preventivo</th>
+                <th>Última OS</th>
+                <th class="text-end">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in veiculos %}
+            <tr>
+                <td>
+                    <div class="fw-bold">{{ v.placa }}</div>
+                    <small class="text-muted">{{ v.marca }} {{ v.modelo }}</small>
+                </td>
+                <td>{{ v.km_atual }} km</td>
+                <td>
+                    {% if v.precisa_revisao %}
+                        <span class="badge bg-danger rounded-pill"><i class="fas fa-tools"></i> REVISÃO URGENTE</span>
+                    {% else %}
+                        <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i> OK</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if v.ordens.last %}
+                        <span class="badge bg-light text-dark">{{ v.ordens.last.get_status_display }}</span>
+                    {% else %}
+                        <span class="text-muted small">Sem histórico</span>
+                    {% endif %}
+                </td>
+                <td class="text-end">
+                    <div class="btn-group shadow-sm">
+                        <a href="/admin/gestao/ordemservico/add/?veiculo={{ v.id }}" class="btn btn-sm btn-outline-primary" title="Nova OS">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                        {% if v.ordens.last %}
+                            <a href="{% url 'detalhe_os' v.ordens.last.pk %}" class="btn btn-sm btn-dark" title="Ver Relatório">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,28 @@
+<form class="ui form" hx-post="{% url 'novo_veiculo' %}" hx-target="#corpo-tabela" hx-on::after-request="this.reset()">
+    <div class="two fields">
+        <div class="field">
+            <label>Placa</label>
+            <input type="text" name="placa" placeholder="ABC1234">
+        </div>
+        <div class="field">
+            <label>Modelo</label>
+            <input type="text" name="modelo" placeholder="Ex: Corolla">
+        </div>
+    </div>
+    <div class="three fields">
+        <div class="field">
+            <label>Marca</label>
+            <input type="text" name="marca">
+        </div>
+        <div class="field">
+            <label>Ano</label>
+            <input type="number" name="ano">
+        </div>
+        <div class="field">
+            <label>Proprietário</label>
+            <input type="text" name="proprietario">
+        </div>
+    </div>
+    <button class="ui primary button" type="submit">Gravar Veículo</button>
+</form>
+
