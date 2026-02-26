@@ -5,25 +5,20 @@ Django settings for setup project.
 from pathlib import Path
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-$t_)%n6sl9g-v9vgziw4dtw)s9$^1)s)obu)fy!m)(fyrkkky*'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
-
-# Application definition
-
+ALLOWED_HOSTS = ['172.20.10.14', '172.16.192.165', '127.0.0.1', 'localhost']
+                                                                                                                                                                            
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.contenttypes',
+    'django.contrib.contenttypes', 
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -61,11 +56,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'setup.wsgi.application'
 
 
-# Database
+# --- BASE DE DADOS (CORRIGIDA COM TIMEOUT) ---
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 20,  # Resolve o erro "database is locked"
+        },
     }
 }
 
@@ -86,28 +85,42 @@ USE_I18N = True
 USE_TZ = True
 
 
-# --- CONFIGURAÇÃO DE FICHEIROS ESTÁTICOS ---
+# --- CONFIGURAÇÃO DE FICHEIROS ESTÁTICOS E MEDIA ---
 
 STATIC_URL = 'static/'
-
 STATICFILES_DIRS = [
     BASE_DIR / "static",          
     BASE_DIR / "gestao" / "static", 
 ]
-
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# --- REDIRECIONAMENTOS DE AUTENTICAÇÃO ---
+# Media files
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
-# Onde o utilizador vai após fazer Login
+
+# --- CONFIGURAÇÃO DE EMAIL (GMAIL SMTP) ---
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Substitui pelo teu endereço de Gmail real abaixo:
+EMAIL_HOST_USER = 'rodrigo.fmoura04@gmail.com' 
+EMAIL_HOST_PASSWORD = 'xtuoqqpaoahjlqla'  # A tua senha de app gerada
+
+# Como o cliente verá o remetente
+DEFAULT_FROM_EMAIL = 'Oficina MESH <o-teu-email@gmail.com>'
+
+
+# --- SEGURANÇA E REDIRECIONAMENTOS ---
+
+# Confiança para o porto 8001 (evita erros de formulário no Admin)
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8001', 'http://localhost:8001']
+
 LOGIN_REDIRECT_URL = 'dashboard'
-
-# Onde o utilizador vai após fazer Logout 
-# CORREÇÃO: Alterado de 'login' para 'dashboard' para evitar o erro NoReverseMatch
-# Se preferires ir para o login do admin, usa: '/admin/login/'
 LOGOUT_REDIRECT_URL = 'dashboard' 
-
-# Define onde o Django procura a página de login se o utilizador tentar aceder a algo restrito
 LOGIN_URL = '/admin/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

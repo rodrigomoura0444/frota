@@ -1,0 +1,14 @@
+# Ambiente Virtual
+venv/
+env/
+
+# Python lixo
+__pycache__/
+*.py[cod]
+
+# Base de dados local (cada PC deve ter a sua)
+db.sqlite3
+
+# Ficheiros de sistema
+.DS_Store
+Thumbs.db

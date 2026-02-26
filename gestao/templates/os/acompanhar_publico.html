@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="60">
+    <title>Status da Reparação - {{ os.veiculo.placa }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card-status { border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); background: white; }
+        .plate-badge { background-color: #1a1a1a; color: white; padding: 6px 18px; border-radius: 6px; font-weight: bold; letter-spacing: 2px; font-size: 1.1rem; }
+        .progress { height: 30px; border-radius: 50px; background-color: #e9ecef; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .progress-bar { font-weight: bold; font-size: 0.9rem; transition: width 1s ease-in-out; }
+        .step-info { font-size: 0.85rem; color: #adb5bd; text-transform: uppercase; font-weight: 600; }
+        .status-text { font-size: 1.2rem; font-weight: bold; color: #333; }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+            
+            <div class="mb-4">
+                <h4 class="text-secondary fw-light">Estado do Serviço</h4>
+            </div>
+            
+            <div class="card card-status p-4 mb-4">
+                <div class="mb-4">
+                    <span class="plate-badge mb-3 d-inline-block">{{ os.veiculo.placa }}</span>
+                    <h3 class="mb-1">{{ os.veiculo.marca }} {{ os.veiculo.modelo }}</h3>
+                    <p class="text-muted">Ordem de Serviço <strong>#{{ os.numero_os }}</strong></p>
+                </div>
+
+                <hr class="opacity-10">
+
+                <div class="my-4">
+                    <div class="d-flex justify-content-between mb-2 px-1">
+                        <span class="step-info">Recebido</span>
+                        <span class="status-text">{{ os.get_status_display }}</span>
+                        <span class="step-info">Pronto</span>
+                    </div>
+                    
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated 
+                            {% if os.status == 'FINALIZADO' or os.status == 'ENTREGUE' %} bg-success {% else %} bg-primary {% endif %}" 
+                            role="progressbar" 
+                            style="width: {{ percentagem }}%;">
+                            {{ percentagem }}%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert {% if os.status == 'FINALIZADO' %} alert-success {% elif os.status == 'AGUARDANDO_PECAS' %} alert-warning {% else %} alert-light border {% endif %} py-3 shadow-sm">
+                    {% if os.status == 'FINALIZADO' %}
+                        <h5 class="alert-heading fw-bold mb-2">✅ Viatura Pronta!</h5>
+                        <p class="mb-0">O serviço foi concluído com sucesso. Pode dirigir-se à nossa oficina para o levantamento.</p>
+                    {% elif os.status == 'AGUARDANDO_PECAS' %}
+                        <div class="spinner-grow spinner-grow-sm text-warning me-2" role="status"></div>
+                        <span class="fw-bold text-dark">Aguardando Peças</span>
+                        <p class="mb-0 mt-2 small">Estamos a aguardar componentes específicos para garantir a qualidade da reparação.</p>
+                    {% elif os.status == 'REPARACAO' %}
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                        <span class="fw-bold">Em Intervenção Técnica</span>
+                        <p class="mb-0 mt-2 small">A sua viatura está a ser assistida neste momento.</p>
+                    {% else %}
+                        <p class="mb-0">Viatura em fila de diagnóstico.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <p class="text-muted small">
+                Última atualização: {% now "H:i" %}<br>
+                <span style="font-size: 10px; opacity: 0.6;">A página atualiza automaticamente a cada minuto.</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

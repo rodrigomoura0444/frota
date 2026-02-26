@@ -1,59 +1,221 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="card shadow-lg p-5 bg-white">
-    <div class="d-flex justify-content-between border-bottom pb-4 mb-4">
-        <div>
-            <h1 class="fw-bold mb-0">ORDEM DE SERVIÇO</h1>
-            <h4 class="text-muted">Nº #{{ os.numero_os }}</h4>
+<div class="container-fluid py-4 min-vh-100" style="background-color: #f0f2f5; font-family: 'Inter', sans-serif;">
+    
+    <header class="row mb-4 px-3">
+        <div class="col-12 p-4 rounded-4 shadow-sm bg-white border-start border-primary border-5 d-flex justify-content-between align-items-center">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item small"><a href="{% url 'dashboard' %}" class="text-decoration-none fw-300 text-muted">Dashboard</a></li>
+                        <li class="breadcrumb-item active small fw-300" aria-current="page">Folha de Obra</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-300 text-dark mb-0" style="letter-spacing: -1px;">Folha de Trabalho <span class="fw-500 text-primary">#{{ os.numero_os|default:os.id }}</span></h2>
+            </div>
+            <div class="text-end">
+                <span class="badge {% if os.status == 'REPARACAO' %}bg-warning-subtle text-warning-emphasis border-warning-subtle{% else %}bg-success-subtle text-success border-success-subtle{% endif %} border px-3 py-2 rounded-pill fw-500 shadow-sm">
+                    <i class="fas {% if os.status == 'REPARACAO' %}fa-tools{% else %}fa-check{% endif %} me-2 small"></i>{{ os.get_status_display }}
+                </span>
+            </div>
         </div>
-        <div class="text-end">
-            <div class="badge bg-dark fs-5 p-2 mb-2">{{ os.get_status_display|upper }}</div>
-            <p class="mb-0">Abertura: {{ os.data_abertura|date:"d/m/Y" }}</p>
-        </div>
-    </div>
+    </header>
 
-    <div class="row mb-5">
-        <div class="col-6">
-            <h6 class="text-uppercase fw-bold text-warning">Viatura</h6>
-            <p class="fs-5 mb-0"><strong>{{ os.veiculo.placa }}</strong></p>
-            <p>{{ os.veiculo.marca }} {{ os.veiculo.modelo }}</p>
-            <p class="text-muted">Proprietário: {{ os.veiculo.proprietario }}</p>
-        </div>
-        <div class="col-6 text-end">
-            <h6 class="text-uppercase fw-bold text-warning">Intervenção</h6>
-            <p class="fs-5 mb-0"><strong>{{ os.get_tipo_servico_display }}</strong></p>
-            <p>Horas Previstas: {{ os.horas_mao_obra }}h</p>
-        </div>
-    </div>
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+        <div class="card-body p-4 p-lg-5">
+            
+            <div class="row mb-5 g-4">
+                <div class="col-md-6">
+                    <div class="p-4 bg-light rounded-4 border-start border-primary border-3 h-100">
+                        <h6 class="x-small text-muted fw-500 text-uppercase tracking-wider mb-2">Identificação da Unidade</h6>
+                        <h1 class="fw-200 text-primary mb-1 tracking-tighter" style="font-size: 3rem;">{{ os.veiculo.placa }}</h1>
+                        <p class="mb-1 fw-400 text-dark">{{ os.veiculo.marca }} {{ os.veiculo.modelo }}</p>
+                        <small class="text-muted fw-300"><i class="far fa-user me-1"></i> {{ os.veiculo.proprietario }}</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-4 bg-light rounded-4 border-start border-danger border-3 h-100">
+                        <h6 class="x-small text-muted fw-500 text-uppercase tracking-wider mb-2">Solicitação de Serviço</h6>
+                        <p class="mb-2 text-dark fw-500">{{ os.get_tipo_servico_display }}</p>
+                        <div class="p-2 bg-white rounded-3 border border-danger-subtle">
+                            <p class="text-danger mb-0 small fw-300"><strong>Reclamação:</strong> {{ os.descricao_avaria }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="bg-light p-4 rounded mb-4">
-        <h6 class="fw-bold text-uppercase small text-muted">Avaria / Solicitação</h6>
-        <p class="lead mb-0">"{{ os.descricao_avaria }}"</p>
-    </div>
+            {% if os.status == 'REPARACAO' %}
+            <form action="{% url 'finalizar_os' %}" method="POST" id="formOS">
+                {% csrf_token %}
+                
+                <div class="row mb-5 g-4">
+                    <div class="col-lg-7">
+                        <label class="x-small text-muted fw-600 text-uppercase tracking-widest d-block mb-3">
+                            <i class="fas fa-file-signature me-2 text-primary"></i>Relatório do Trabalho Efetuado
+                        </label>
+                        <textarea name="diagnostico_tecnico" class="form-control border-light-subtle rounded-4 p-4 fw-300 shadow-sm" 
+                                  rows="9" style="background-color: #fafbfc;" 
+                                  placeholder="Descreva detalhadamente a intervenção...">{{ os.diagnostico_tecnico|default:'' }}</textarea>
+                    </div>
 
-    <div class="row g-4 mb-5">
-        <div class="col-md-6">
-            <h6 class="fw-bold border-bottom pb-2">Diagnóstico Técnico</h6>
-            <p>{{ os.diagnostico_tecnico|default:"A aguardar análise técnica." }}</p>
-        </div>
-        <div class="col-md-6">
-            <h6 class="fw-bold border-bottom pb-2">Peças e Materiais</h6>
-            <p>{{ os.pecas_aplicadas|default:"Nenhuma peça registada." }}</p>
-        </div>
-    </div>
+                    <div class="col-lg-5">
+                        <label class="x-small text-muted fw-600 text-uppercase tracking-widest d-block mb-3">
+                            <i class="fas fa-clock me-2 text-primary"></i>Mão de Obra (Horas)
+                        </label>
+                        <div class="p-4 border border-light-subtle rounded-4 bg-white shadow-sm">
+                            <div class="row g-2 mb-4">
+                                <div class="col-3">
+                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h05" value="0.5" {% if os.horas_mao_de_obra == 0.5 %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h05">0.5h</label>
+                                </div>
+                                <div class="col-3">
+                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h10" value="1.0" {% if os.horas_mao_de_obra == 1.0 %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h10">1.0h</label>
+                                </div>
+                                <div class="col-3">
+                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h15" value="1.5" {% if os.horas_mao_de_obra == 1.5 %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h15">1.5h</label>
+                                </div>
+                                <div class="col-3">
+                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h20" value="2.0" {% if os.horas_mao_de_obra == 2.0 %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h20">2.0h</label>
+                                </div>
+                            </div>
+                            <div class="text-center bg-primary-subtle py-2 rounded-3">
+                                <small class="text-primary fw-500">Valor Atual: <span class="fw-200 fs-5 ms-1">{{ os.horas_mao_de_obra|default:"0"|floatformat:1 }}h</span></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="d-none d-print-block mt-5 pt-5">
-        <div class="row text-center">
-            <div class="col-6"><p class="border-top pt-2">O Responsável Técnico</p></div>
-            <div class="col-6"><p class="border-top pt-2">Assinatura do Cliente</p></div>
-        </div>
-    </div>
+                <div class="mb-5">
+                    <h6 class="x-small text-muted fw-600 text-uppercase tracking-widest mb-4">
+                        <i class="fas fa-boxes me-2 text-primary"></i>Listagem de Peças Aplicadas
+                    </h6>
+                    <div class="table-responsive rounded-4 border border-light-subtle shadow-sm">
+                        <table class="table table-hover align-middle mb-0 bg-white">
+                            <thead class="bg-light">
+                                <tr class="fw-500 text-muted x-small text-uppercase">
+                                    <th class="ps-4 py-3">Descrição da Peça</th>
+                                    <th>Marca Utilizada</th>
+                                    <th class="text-center" style="width: 120px;">Qtd</th>
+                                    <th class="text-center ps-3">Confirmação</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fw-300">
+                                {% for item in os.pecas.all %}
+                                <tr>
+                                    <td class="ps-4 fw-500 text-dark">{{ item.nome_peca }}</td>
+                                    <td>
+                                        <input type="text" name="marca_{{ item.id }}" value="{{ item.marca|default:'' }}" class="form-control form-control-sm border-light-subtle fw-300" placeholder="Marca...">
+                                    </td>
+                                    <td>
+                                        <input type="number" step="0.1" name="qtd_{{ item.id }}" value="{{ item.quantidade|floatformat:1 }}" class="form-control form-control-sm text-center border-light-subtle fw-300">
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="form-check form-switch d-inline-block">
+                                            <input class="form-check-input" type="checkbox" name="confirmado_{{ item.id }}" id="check_{{ item.id }}" style="cursor: pointer;" {% if item.confirmado %}checked{% endif %}>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-5 text-muted fw-300">Nenhuma peça prevista para esta OS.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-    <div class="card-footer bg-white text-center no-print mt-4">
-        <button onclick="window.print()" class="btn btn-warning btn-lg px-5 fw-bold shadow">
-            <i class="fas fa-print me-2"></i>GERAR PDF / IMPRIMIR
-        </button>
-        <a href="{% url 'lista_os' %}" class="btn btn-outline-secondary btn-lg px-4 ms-2">VOLTAR</a>
+                <div class="card border-warning-subtle bg-warning-subtle mb-5 rounded-4 border-dashed p-2">
+                    <div class="card-body">
+                        <h6 class="fw-500 text-warning-emphasis mb-3 x-small text-uppercase">
+                            <i class="fas fa-plus-circle me-2"></i>Registar Peça Extra (Não Prevista)
+                        </h6>
+                        <div class="row g-2">
+                            <div class="col-12 col-md-5">
+                                <input type="text" name="nova_peca_nome" class="form-control border-0 shadow-sm fw-300 py-2" placeholder="Nome da peça...">
+                            </div>
+                            <div class="col-12 col-md-3">
+                                <input type="text" name="nova_peca_marca" class="form-control border-0 shadow-sm fw-300 py-2" placeholder="Marca (ex: Bosch)">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <input type="number" step="0.1" name="nova_peca_qtd" class="form-control border-0 shadow-sm text-center fw-300 py-2" value="1">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <button type="submit" name="botao_finalizar_extra" value="false" class="btn btn-warning w-100 fw-500 shadow-sm border-0 py-2">
+                                    <i class="fas fa-plus small"></i> ADD
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <a href="{% url 'dashboard' %}" class="btn btn-light border-0 w-100 py-3 rounded-3 fw-400 text-muted text-decoration-none text-center">Voltar</a>
+                    </div>
+                    <div class="col-md-5">
+                        <button type="submit" name="botao_finalizar" value="false" class="btn btn-dark w-100 py-3 fw-400 rounded-3 shadow-sm">
+                            <i class="far fa-save me-2"></i>Guardar Rascunho
+                        </button>
+                    </div>
+                    <div class="col-md-5">
+                        <button type="button" onclick="confirmarFecho()" class="btn btn-success w-100 py-3 fw-500 rounded-3 shadow-green border-0">
+                            <i class="fas fa-check-double me-2"></i>FINALIZAR TRABALHO
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" name="botao_finalizar" id="inputFinalizar" value="false">
+            </form>
+            
+            {% else %}
+            <div class="text-center py-5">
+                <div class="bg-success-subtle text-success d-inline-block p-4 rounded-circle mb-4">
+                    <i class="fas fa-check-circle fa-4x"></i>
+                </div>
+                <h2 class="fw-200 text-dark mb-3 tracking-tighter">Intervenção Concluída</h2>
+                <p class="fw-300 text-muted mb-5">O relatório foi encerrado e a viatura está pronta para entrega.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'gerar_pdf_os' os.id %}" class="btn btn-warning py-3 px-5 rounded-4 fw-500 shadow-sm border-0 text-decoration-none text-dark">
+                        <i class="fas fa-file-pdf me-2"></i>GERAR PDF PARA ENTREGA
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-primary py-3 px-5 rounded-4 fw-300 text-decoration-none">Sair</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </div>
+
+<style>
+    .fw-200 { font-weight: 200; }
+    .fw-300 { font-weight: 300; }
+    .fw-400 { font-weight: 400; }
+    .fw-500 { font-weight: 500; }
+    .fw-600 { font-weight: 600; }
+    .x-small { font-size: 0.7rem; }
+    .tracking-widest { letter-spacing: 0.15em; }
+    .tracking-tighter { letter-spacing: -2px; }
+    .bg-primary-subtle { background-color: #eef2ff !important; }
+    .bg-success-subtle { background-color: #ecfdf5 !important; }
+    .bg-warning-subtle { background-color: #fffbeb !important; }
+    .border-warning-subtle { border-color: #fef3c7 !important; }
+    .text-warning-emphasis { color: #92400e !important; }
+    .border-dashed { border: 2px dashed #cbd5e1 !important; }
+    .shadow-green { box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.25); }
+    .btn-outline-primary { border-color: #f1f5f9; color: #64748b; background: #fff; }
+    .btn-check:checked + .btn-outline-primary { background-color: #0d6efd !important; border-color: #0d6efd !important; color: #fff !important; }
+    .form-control:focus { box-shadow: none; border-color: #0d6efd; }
+    .breadcrumb-item + .breadcrumb-item::before { content: "→"; color: #cbd5e1; }
+</style>
+
+<script>
+    function confirmarFecho() {
+        if (confirm("Deseja finalizar a reparação? Certifique-se que registou todas as peças. O cliente receberá um e-mail automático.")) {
+            document.getElementById('inputFinalizar').value = "true";
+            document.getElementById('formOS').submit();
+        }
+    }
+</script>
 {% endblock %}

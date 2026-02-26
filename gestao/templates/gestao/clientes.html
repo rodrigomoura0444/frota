@@ -1,9 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="mb-4">
-    <h3 class="fw-bold">Base de Dados: Clientes e Frotas</h3>
-    <p class="text-muted">Lista de proprietários associados a veículos ativos no sistema.</p>
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <div>
+        <h3 class="fw-bold">Base de Dados: Clientes e Frotas</h3>
+        <p class="text-muted">Lista de proprietários e contactos associados às viaturas.</p>
+    </div>
+    <a href="/admin/gestao/veiculo/add/" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Novo Cliente/Viatura
+    </a>
 </div>
 
 <div class="row g-4">
@@ -12,24 +17,46 @@
         <div class="card shadow-sm h-100 border-0">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
-                    <div class="bg-primary text-white rounded-circle p-3 me-3">
-                        <i class="fas fa-user fa-lg"></i>
+                    <div class="bg-soft-primary text-primary rounded-circle p-3 me-3" style="background-color: #e7f1ff;">
+                        <i class="fas fa-user-tie fa-lg"></i>
                     </div>
                     <div>
-                        <h5 class="mb-0 fw-bold">{{ v.proprietario }}</h5>
-                        <small class="text-muted">ID Cliente: #{{ v.id }}</small>
+                        <h5 class="mb-0 fw-bold">{{ v.proprietario|default:"Proprietário Não Registado" }}</h5>
+                        <small class="text-muted">Viatura: <span class="badge bg-secondary">{{ v.placa }}</span></small>
                     </div>
                 </div>
-                <div class="bg-light p-3 rounded">
-                    <h6 class="fw-bold mb-2">Viatura Associada:</h6>
-                    <p class="mb-1 text-uppercase"><strong>{{ v.placa }}</strong></p>
-                    <p class="mb-0 small text-muted">{{ v.marca }} {{ v.modelo }}</p>
+
+                <div class="bg-light p-3 rounded mb-3">
+                    <h6 class="fw-bold mb-2 small text-uppercase text-muted">Detalhes do Contacto:</h6>
+                    <p class="mb-1">
+                        <i class="fas fa-phone-alt me-2 text-success"></i>
+                        <strong>{{ v.telemovel_proprietario|default:"Sem contacto" }}</strong>
+                    </p>
+                </div>
+
+                <div class="border-top pt-3">
+                    <h6 class="fw-bold mb-1 small text-muted text-uppercase">Informação do Veículo:</h6>
+                    <p class="mb-0">{{ v.marca }} {{ v.modelo }} ({{ v.ano }})</p>
+                    <small class="text-muted">{{ v.km_atual }} KM registados</small>
                 </div>
             </div>
-            <div class="card-footer bg-transparent border-0 pb-3">
-                <a href="/admin/gestao/veiculo/{{ v.id }}/change/" class="btn btn-sm btn-outline-primary w-100">Editar Perfil</a>
+            
+            <div class="card-footer bg-transparent border-0 d-flex gap-2 pb-3">
+                <a href="/admin/gestao/veiculo/{{ v.id }}/change/" class="btn btn-sm btn-outline-primary flex-grow-1">
+                    <i class="fas fa-edit me-1"></i> Editar
+                </a>
+                {% if v.telemovel_proprietario %}
+                <a href="https://wa.me/351{{ v.telemovel_proprietario }}" target="_blank" class="btn btn-sm btn-outline-success">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+                {% endif %}
             </div>
         </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <i class="fas fa-car-side fa-3x text-muted mb-3"></i>
+        <p class="text-muted">Ainda não existem viaturas ou clientes registados.</p>
     </div>
     {% endfor %}
 </div>

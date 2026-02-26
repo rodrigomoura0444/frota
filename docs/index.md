@@ -1,51 +1,16 @@
-# 🚛 Frota Pro - Enterprise Resource Planning
+# Mesh Auto: Fluxo de Gestão Profissional
 
-Bem-vindo à documentação oficial do **Frota Pro**. Este sistema foi desenhado para gerir frotas de veículos pesados e ligeiros com foco em auditoria de custos e eficiência operacional.
+Bem-vindo à documentação técnica do **Mesh Auto**, um ecossistema ERP focado no fluxo operacional de oficinas mecânicas. Este projeto foi desenhado para eliminar gargalos de comunicação entre o mecânico e o cliente final.
 
-## 📊 Estrutura de Fluxo Operacional
+## 🚀 Visão Geral
+O sistema não é apenas um CRUD de ordens de serviço. É uma ferramenta de monitorização de performance que gere:
+* **Ciclo de Vida da OS:** Do check-in à entrega final.
+* **Notificações em Tempo Real:** Feedback visual via Django Messages.
+* **Comunicação Automatizada:** Envio de e-mails profissionais com status em tempo real.
+* **Auditoria de Tempo:** Monitorização de eficiência por viatura.
 
-```mermaid
-graph LR
-    A[Entrada Viatura] --> B(Abertura OS)
-    B --> C{Processamento}
-    C -->|Manutenção| D[Peças e Mão de Obra]
-    C -->|Vistoria| E[Checklist]
-    D --> F[Cálculo de Custos]
-    E --> F
-    F --> G[Geração de Relatório PDF]
-    G --> H[Encerramento e Arquivo]
-
-
-
-    ---
-
-### 2. `docs/modelos_dados.md` (Engenharia de Software)
-```markdown
-# 🏗 Modelagem de Dados e Relacionamentos
-
-A integridade referencial é garantida pelo motor de base de dados, utilizando as seguintes entidades principais:
-
-## 📐 Diagrama de Classes (UML)
-
-```mermaid
-classDiagram
-    class Veiculo {
-        +String placa
-        +String marca
-        +String modelo
-        +get_total_gasto()
-    }
-    class OrdemServico {
-        +Int numero_os
-        +DateTime data_abertura
-        +Decimal valor_pecas
-        +Decimal valor_mao_de_obra
-        +calcular_total()
-    }
-    class Cliente {
-        +String nome
-        +String nif
-    }
-
-    Cliente "1" -- "*" Veiculo : possui
-    Veiculo "1" -- "*" OrdemServico : histórico
+## 🛠️ Stack Tecnológica
+* **Backend:** Python / Django 5.x
+* **Base de Dados:** PostgreSQL / SQLite
+* **Frontend:** HTML5, CSS3 (Bootstrap 5), JavaScript
+* **Relatórios:** xhtml2pdf para geração de faturação técnica.

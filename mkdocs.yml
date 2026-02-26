@@ -1,26 +1,35 @@
-site_name: Frota Pro Documentation
+site_name: Mesh Auto | Gestão de Fluxo
+site_description: Documentação técnica do sistema de gestão de oficina profissional.
+site_author: Teu Nome
 
 theme:
   name: material
-  logo: assets/logo.png    # <--- Adiciona esta linha
-  favicon: assets/logo.png # <--- Opcional: ícone na aba do browser
+  language: pt
   palette:
-    scheme: slate
-    primary: indigo
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: blue
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: blue
   features:
-    - navigation.expand
+    - navigation.tabs
+    - navigation.sections
     - content.code.copy
-    - navigation.top        # Adiciona um botão "voltar ao topo"
-
-
-markdown_extensions:
-  - pymdownx.superfences
-  - admonition
-  - attr_list
+    - search.suggest
 
 nav:
-  - Visão Geral: index.md
-  - Modelagem de Dados: modelos_dados.md
-  - Dashboard & BI: dashboard.md
-  - Relatórios PDF: ordens_servico.md
-  - Segurança: seguranca.md
+  - Introdução: index.md
+  - Arquitetura de Dados: logica-negocio.md
+  - Segurança e Sessões: seguranca.md
+  - Componentes Técnicos: tecnico.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg

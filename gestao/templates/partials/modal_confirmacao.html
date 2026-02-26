@@ -1,20 +1,71 @@
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title fw-bold">Confirmar Exclusão</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body py-4">
-                <div class="text-center mb-3 text-danger">
-                    <i class="fas fa-exclamation-triangle fa-3x"></i>
-                </div>
-                <p class="text-center fs-5 mb-0">Tens a certeza que desejas remover este registo?<br><strong>Esta ação não pode ser desfeita.</strong></p>
-            </div>
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger px-4 shadow-sm" id="btnConfirmDelete">Eliminar Definitivamente</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                    
+                    <tr>
+                        <td style="background-color: #1e293b; padding: 40px 20px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; font-weight: 900;">GESTOR DE FROTA</h1>
+                            <p style="color: #94a3b8; margin: 10px 0 0 0; font-size: 13px; text-transform: uppercase;">Notificação de Serviço em Tempo Real</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 40px;">
+                            <h2 style="color: #1e293b; margin-top: 0; font-size: 20px;">Olá, {{ ordem.veiculo.proprietario }}</h2>
+                            <p style="color: #475569; font-size: 16px; line-height: 1.6;">
+                                Informamos que a intervenção na sua viatura foi atualizada. A nossa equipa técnica está focada em garantir a máxima qualidade no serviço.
+                            </p>
+
+                            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin: 30px 0;">
+                                <table width="100%">
+                                    <tr>
+                                        <td>
+                                            <span style="font-size: 11px; color: #64748b; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px;">Viatura</span>
+                                            <div style="font-size: 18px; color: #1e293b; font-weight: bold;">{{ ordem.veiculo.placa }}</div>
+                                            <div style="color: #64748b; font-size: 14px;">{{ ordem.veiculo.marca }} {{ ordem.veiculo.modelo }}</div>
+                                        </td>
+                                        <td style="text-align: right; vertical-align: top;">
+                                            <span style="font-size: 11px; color: #64748b; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px;">Estado Atual</span>
+                                            <div style="color: {{ cor_destaque }}; font-weight: 900; font-size: 16px;">● {{ ordem.get_status_display|upper }}</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            {% if ordem.status == 'REPARACAO' %}
+                            <p style="color: #475569; font-size: 15px;">
+                                <strong>Previsão de Conclusão:</strong><br>
+                                <span style="font-size: 18px; color: #0d6efd; font-weight: bold;">{{ ordem.hora_prevista_entrega|date:"H:i" }}</span>
+                            </p>
+                            {% endif %}
+
+                            <div style="text-align: center; margin-top: 40px;">
+                                <a href="{{ link_status }}" style="background-color: {{ cor_destaque }}; color: #ffffff; padding: 16px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; transition: background-color 0.3s;">
+                                    ACOMPANHAR PROGRESSO ONLINE
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+                            <p style="color: #94a3b8; font-size: 12px; margin: 0; line-height: 1.5;">
+                                Este é um e-mail automático enviado pela nossa plataforma de gestão.<br>
+                                <strong>© 2026 Oficina Profissional</strong>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
