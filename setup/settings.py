@@ -7,14 +7,12 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 SECRET_KEY = 'django-insecure-$t_)%n6sl9g-v9vgziw4dtw)s9$^1)s)obu)fy!m)(fyrkkky*'
-
 
 DEBUG = True
 
 ALLOWED_HOSTS = ['172.20.10.14', '172.16.192.165', '127.0.0.1', 'localhost']
-                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                        
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -106,18 +104,23 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-# Substitui pelo teu endereço de Gmail real abaixo:
+# Credenciais de autenticação
 EMAIL_HOST_USER = 'rodrigo.fmoura04@gmail.com' 
 EMAIL_HOST_PASSWORD = 'xtuoqqpaoahjlqla'  # A tua senha de app gerada
 
-# Como o cliente verá o remetente
-DEFAULT_FROM_EMAIL = 'Oficina MESH <o-teu-email@gmail.com>'
+# Remetente padrão (Ajustado para o teu e-mail real para evitar rejeição)
+DEFAULT_FROM_EMAIL = 'Oficina MESH <rodrigo.fmoura04@gmail.com>'
 
 
 # --- SEGURANÇA E REDIRECIONAMENTOS ---
 
-# Confiança para o porto 8001 (evita erros de formulário no Admin)
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8001', 'http://localhost:8001']
+# Confiança para as origens de acesso (Adicionados os teus IPs locais)
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8001', 
+    'http://localhost:8001',
+    'http://172.20.10.14:8001',
+    'http://172.16.192.165:8001'
+]
 
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'dashboard' 

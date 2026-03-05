@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from datetime import timedelta
+from decimal import Decimal
 
+# Modelo: Veículo
 class Veiculo(models.Model):
     placa = models.CharField(max_length=10, unique=True, verbose_name="Matrícula")
     marca = models.CharField(max_length=50)
@@ -20,7 +23,7 @@ class Veiculo(models.Model):
     def __str__(self):
         return f"{self.placa} - {self.marca} {self.modelo}"
 
-# --- NOVO MODELO PARA GESTÃO DE INVENTÁRIO ---
+# Modelo: Peça em Stock
 class PecaStock(models.Model):
     nome = models.CharField(max_length=100)
     referencia = models.CharField(max_length=50, unique=True, verbose_name="Referência/SKU")
@@ -34,8 +37,8 @@ class PecaStock(models.Model):
     def __str__(self):
         return f"{self.nome} (Ref: {self.referencia}) - Qtd: {self.quantidade_em_stock}"
 
+# Modelo: Ordem de Serviço
 class OrdemServico(models.Model):
-    # Organizado para suportar a lógica de exibição de previsão
     TIPO_CHOICES = [
         ('REPARACAO', 'Reparação Corretiva'), 
         ('MANUTENCAO', 'Manutenção Preventiva'), 
@@ -48,6 +51,10 @@ class OrdemServico(models.Model):
         ('AGUARDANDO_PECAS', 'A aguardar peças'), 
         ('FINALIZADO', 'Finalizado'), 
         ('ENTREGUE', 'Entregue'),
+    ]
+    PRIORIDADE_CHOICES = [
+        ('Normal', 'Normal'),
+        ('Urgente', 'Urgente'),
     ]
 
     numero_os = models.CharField(max_length=20, unique=True, null=True, blank=True, verbose_name="Número da OS")
@@ -63,6 +70,7 @@ class OrdemServico(models.Model):
     )
     
     tipo_servico = models.CharField(max_length=20, choices=TIPO_CHOICES, default='REPARACAO')
+    prioridade = models.CharField(max_length=10, choices=PRIORIDADE_CHOICES, default='Normal', verbose_name="Prioridade")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='RECEBIDO')
     descricao_avaria = models.TextField(verbose_name="Descrição da Avaria")
     diagnostico_tecnico = models.TextField(blank=True, null=True, verbose_name="Diagnóstico Técnico")
@@ -78,23 +86,17 @@ class OrdemServico(models.Model):
         verbose_name = "Ordem de Serviço"
         verbose_name_plural = "Ordens de Serviço"
 
-    # --- LÓGICA DO SEMÁFORO DE PEÇAS ---
+    @property
     def status_pecas(self):
         pecas_da_os = self.pecas.all()
         if not pecas_da_os.exists():
-            return 'verde'  # Sem peças necessárias = Caminho livre
-
+            return 'verde'
         total_pecas = pecas_da_os.count()
         disponiveis = 0
-        
         for p in pecas_da_os:
-            if p.peca_referencia: # Se estiver ligada ao stock
+            if p.peca_referencia:
                 if p.peca_referencia.quantidade_em_stock >= p.quantidade:
                     disponiveis += 1
-            else:
-                # Se não houver ligação ao stock, assumimos que precisa de ser verificada
-                pass
-
         if disponiveis == total_pecas:
             return 'verde'
         elif disponiveis > 0:
@@ -113,9 +115,12 @@ class OrdemServico(models.Model):
                 except: novo_numero = 1
             else: novo_numero = 1
             self.numero_os = f"OS-{ano_atual}-{novo_numero:03d}"
+            
+        if not self.status:
             self.status = 'RECEBIDO'
 
-        if self.status == 'REPARACAO' and not self.data_atribuicao:
+        status_ativos = ['DIAGNOSTICO', 'REPARACAO', 'AGUARDANDO_PECAS']
+        if self.status in status_ativos and self.mecanico and not self.data_atribuicao:
             self.data_atribuicao = timezone.now()
 
         if self.status in ['FINALIZADO', 'ENTREGUE'] and not self.data_fechamento:
@@ -125,15 +130,15 @@ class OrdemServico(models.Model):
 
     @property
     def hora_prevista_entrega(self):
-        # A lógica de exibição (se mostra ou não) é controlada no HTML
         if self.data_atribuicao:
-            estimativa = float(self.horas_mao_de_obra) if self.horas_mao_de_obra > 0 else 2.0
+            estimativa_base = 1.0 if self.prioridade == 'Urgente' else 2.0
+            estimativa = float(self.horas_mao_de_obra) if self.horas_mao_de_obra > 0 else estimativa_base
             return self.data_atribuicao + timedelta(hours=estimativa)
         return None
 
     @property
     def total_pecas(self):
-        return sum(p.valor_total for p in self.pecas.all()) or 0
+        return sum(p.valor_total for p in self.pecas.all()) or Decimal('0.00')
 
     @property
     def total_mao_de_obra(self):
@@ -141,11 +146,29 @@ class OrdemServico(models.Model):
 
     @property
     def total_geral(self):
-        return (self.total_pecas) + (self.total_mao_de_obra)
+        return self.total_pecas + self.total_mao_de_obra
+
+    # --- NOVAS PROPRIEDADES PARA RESOLVER O ERRO DO TEMPLATE (OPÇÃO 1) ---
+    @property
+    def numero_os_limpo(self):
+        """Retorna apenas o número final da OS (ex: 001)"""
+        if self.numero_os:
+            return self.numero_os.split('-')[-1]
+        return ""
+
+    @property
+    def ano_os(self):
+        """Retorna apenas o ano da OS (ex: 2026)"""
+        if self.numero_os:
+            parts = self.numero_os.split('-')
+            if len(parts) > 1:
+                return parts[1]
+        return ""
 
     def __str__(self):
-        return f"{self.numero_os} - {self.veiculo.placa}"
+        return f"{self.numero_os} - {self.veiculo.placa} ({self.prioridade})"
 
+# Modelo: Peça na Ordem de Serviço
 class PecaOS(models.Model):
     ordem_servico = models.ForeignKey(OrdemServico, related_name='pecas', on_delete=models.CASCADE)
     peca_referencia = models.ForeignKey(PecaStock, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Vincular ao Stock")
@@ -167,6 +190,7 @@ class PecaOS(models.Model):
     def __str__(self):
         return f"{self.nome_peca} (OS {self.ordem_servico.numero_os})"
 
+# Modelo: Detalhe da Intervenção
 class DetalheIntervencao(models.Model):
     ordem_servico = models.OneToOneField(OrdemServico, on_delete=models.CASCADE, related_name='detalhe_planeamento')
     diagnostico_detalhado = models.TextField(blank=True, null=True)

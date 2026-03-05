@@ -1,268 +1,378 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<div class="container-fluid py-3 min-vh-100" style="background-color: #ffffff; font-family: 'Inter', sans-serif;">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --bg-main: #f8fafc;
+        --header-dark: #0f172a;
+        --primary-blue: #2563eb;
+        --success-emerald: #059669;
+        --danger-red: #ef4444;
+        --slate-200: #e2e8f0;
+        --slate-700: #334155;
+    }
+
+    body { background-color: var(--bg-main); font-family: 'Inter', sans-serif; }
+    .app-container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+    /* ANIMAÇÃO PARA OS URGENTES */
+    .card-urgente {
+        border: 2px solid var(--danger-red) !important;
+        animation: pulse-border 2s infinite;
+    }
+
+    @keyframes pulse-border {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* --- BARRA DE TOPO INOVADORA --- */
+    .premium-header {
+        background: var(--header-dark);
+        border-radius: 24px;
+        padding: 20px 25px;
+        color: white;
+        margin-bottom: 25px;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255,255,255,0.1);
+        position: relative;
+    }
+
+    .btn-menu-dots {
+        background: rgba(255,255,255,0.1);
+        border: none;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 12px;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+    .btn-menu-dots:hover {
+        background: rgba(255,255,255,0.2);
+    }
+
+    .op-meta-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        gap: 15px;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .meta-item { display: flex; flex-direction: column; }
+    .meta-label { font-size: 0.6rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+    .meta-value { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 700; color: #f8fafc; }
+
+    .efficiency-tag { background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; }
+
+    /* --- ESTILOS DOS CARDS --- */
+    .nav-pills-custom { background: #e2e8f0; padding: 5px; border-radius: 15px; margin-bottom: 25px; }
+    .nav-pills-custom .nav-link { border-radius: 12px; color: var(--slate-700); font-weight: 700; padding: 12px; border: none; }
+    .nav-pills-custom .nav-link.active { background: white; color: var(--primary-blue); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+    .prod-card { background: white; border-radius: 20px; border: 1px solid var(--slate-200); margin-bottom: 20px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .prod-card-header { background: #f1f5f9; padding: 15px 20px; border-bottom: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; }
+    .mecanico-info { display: flex; align-items: center; gap: 12px; padding: 20px; }
+    .avatar-circle { width: 45px; height: 45px; background: var(--header-dark); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; }
     
-    <header class="row mb-4 px-2">
-        <div class="col-12 p-0 rounded-4 shadow-sm overflow-hidden bg-white border border-2">
-            <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom bg-white">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="bg-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-                        <i class="fas fa-wrench text-white"></i>
+    .tech-progress-container { padding: 0 20px 20px 20px; }
+    .progress-track { height: 6px; background: #f1f5f9; border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #10b981, #34d399); transition: width 0.5s ease; }
+    
+    .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--slate-200); border-top: 1px solid var(--slate-200); }
+    .data-cell { background: white; padding: 15px 20px; }
+    .cell-label { font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    .cell-value { font-weight: 700; color: var(--slate-700); font-size: 0.9rem; }
+    .btn-work { background: var(--header-dark); color: white; width: 100%; border: none; padding: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; cursor: pointer; text-decoration: none; }
+    .plate-badge { background: var(--header-dark); color: white; padding: 5px 12px; border-radius: 8px; font-family: 'JetBrains Mono'; font-weight: 700; font-size: 0.9rem; }
+    
+    #digital-clock { font-size: 1.6rem; font-weight: 800; color: #38bdf8; letter-spacing: -1px; }
+
+    /* FEED DE ATIVIDADE */
+    .activity-feed { max-height: 400px; overflow-y: auto; }
+    .activity-item { border-left: 2px solid var(--slate-200); padding-left: 15px; padding-bottom: 20px; position: relative; }
+    .activity-item::before { content: ''; position: absolute; left: -5px; top: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--primary-blue); }
+
+    /* OFFCANVAS CUSTOM */
+    .offcanvas { background: var(--bg-main); border-left: 1px solid var(--slate-200); width: 380px !important; }
+    .offcanvas-header { background: var(--header-dark); color: white; padding: 25px; }
+
+    /* DESIGN PROFISSIONAL TÉCNICOS ONLINE */
+    .tech-status-card {
+        background: white;
+        border: 1px solid var(--slate-200);
+        border-radius: 16px;
+        padding: 12px 15px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .tech-status-card:hover {
+        border-color: var(--primary-blue);
+        transform: translateX(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .tech-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        color: var(--header-dark);
+        border: 1px solid var(--slate-200);
+    }
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--success-emerald);
+        box-shadow: 0 0 8px var(--success-emerald);
+        display: inline-block;
+        margin-right: 5px;
+    }
+</style>
+
+<div class="app-container">
+    <header class="premium-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="d-flex align-items-start gap-3">
+                <button class="btn-menu-dots" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasInfo">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div>
+                    <h1 class="h4 fw-900 m-0" style="letter-spacing: -0.5px;"> <span style="color: #38bdf8;">Oficina Tres60</span></h1>
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                        <span class="efficiency-tag"><i class="fas fa-bolt me-1"></i> Pista Rápida Ativa</span>
                     </div>
-                    <div>
-                        <h3 class="fw-bold text-dark mb-0">Gestão Operacional</h3>
-                        <small class="text-muted fw-bold">OFICINA EM TEMPO REAL</small>
-                    </div>
-                </div>
-                <div class="text-end">
-                    <span class="badge pulse-green bg-white text-success border border-success-subtle rounded-pill px-3 mb-1">
-                        <span class="dot"></span> SISTEMA ATIVO
-                    </span>
-                    <h2 class="mb-0 fw-bold text-dark font-monospace" id="clock" style="letter-spacing: 2px;">00:00:00</h2>
                 </div>
             </div>
-            <div class="row g-0 bg-white">
-                <div class="col-6 col-md-3 border-end p-3 text-center">
-                    <small class="text-uppercase text-muted fw-black" style="font-size: 12px;">Capacidade</small>
-                    <h2 class="mb-0 fw-bold text-primary">82%</h2>
-                </div>
-                <div class="col-6 col-md-3 border-end p-3 text-center">
-                    <small class="text-uppercase text-muted fw-black" style="font-size: 12px;">Em Espera</small>
-                    <h2 class="mb-0 fw-bold text-dark">{{ fila|length }}</h2>
-                </div>
-                <div class="col-6 col-md-3 border-end p-3 text-center">
-                    <small class="text-uppercase text-muted fw-black" style="font-size: 12px;">Ativos</small>
-                    <h2 class="mb-0 fw-bold text-success">{{ trabalhos_ativos|length }}</h2>
-                </div>
-                <div class="col-6 col-md-3 p-3 text-center bg-danger-subtle">
-                    <small class="text-uppercase text-danger fw-black" style="font-size: 12px;">Alertas Criticos</small>
-                    <h2 class="mb-0 fw-bold text-danger">2</h2>
-                </div>
+            <div class="text-end">
+                <div id="digital-clock">00:00</div>
+                <div class="meta-label">Gestão de Produção</div>
+            </div>
+        </div>
+
+        <div class="op-meta-grid">
+            <div class="meta-item">
+                <span class="meta-label">Trabalhos Ativos</span>
+                <span class="meta-value">{{ trabalhos_ativos|length }} <small class="text-muted" style="font-size: 0.6rem;">UNIDADES</small></span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Ocupação Oficina</span>
+                <span class="meta-value text-info">{% if capacidade %}{{ capacidade }}{% else %}75{% endif %}%</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Produtividade</span>
+                <span class="meta-value text-success">94.2%</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Urgências</span>
+                <span class="meta-value text-danger">{% if urgentes %}{{ urgentes|length }}{% else %}0{% endif %}</span>
             </div>
         </div>
     </header>
 
-    <div class="row g-4">
-        <div class="col-12 col-xl-5">
-            <div class="d-flex align-items-center justify-content-between mb-3 px-2">
-                <div class="d-flex align-items-center">
-                    <div class="bg-dark text-white rounded-3 p-2 me-3 shadow"><i class="fas fa-clock-rotate-left"></i></div>
-                    <h5 class="fw-bold m-0 text-uppercase" style="letter-spacing: 1px;">Fila de Espera</h5>
-                </div>
-                <span class="badge bg-dark rounded-pill">{{ fila|length }} Veículos</span>
-            </div>
-            
-            <div class="scroll-container" style="max-height: 75vh; overflow-y: auto; padding-right: 5px;">
-                {% for os in fila %}
-                <div class="card border-0 shadow-sm rounded-4 mb-3 item-waiting transition-all overflow-hidden border-start border-5 {% if os.status_pecas == 'vermelho' %}border-danger{% else %}border-warning{% endif %}" style="background-color: #fcfcfc; border: 1px solid #eee;">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div>
-                                <h1 class="display-5 fw-black mb-0 text-dark" style="letter-spacing: -1px;">{{ os.veiculo.placa }}</h1>
-                                <div class="d-flex gap-2 align-items-center mt-1">
-                                    <span class="badge bg-secondary text-uppercase px-2 py-1">{{ os.veiculo.marca }}</span>
-                                    <span class="text-muted fw-bold">{{ os.veiculo.modelo }}</span>
-                                </div>
-                            </div>
-                            <div class="text-end">
-                                {% with s_pecas=os.status_pecas %}
-                                    {% if s_pecas == 'verde' %}
-                                        <span class="badge bg-success d-block mb-1 p-2 shadow-sm"><i class="fas fa-check-circle me-1"></i> PEÇAS OK</span>
-                                    {% elif s_pecas == 'amarelo' %}
-                                        <span class="badge bg-warning text-dark d-block mb-1 p-2 shadow-sm"><i class="fas fa-clock me-1"></i> AGUARDAR STOCK</span>
-                                    {% else %}
-                                        <span class="badge bg-danger d-block mb-1 p-2 shadow-sm pulse-red"><i class="fas fa-exclamation-triangle me-1"></i> FALTA STOCK</span>
-                                    {% endif %}
-                                {% endwith %}
-                                <div class="bg-white p-2 rounded-3 border shadow-sm mt-2">
-                                    <p class="text-muted small fw-bold mb-0">AGUARDA HÁ</p>
-                                    <h4 class="fw-bold text-danger mb-0">{{ os.data_abertura|timesince }}</h4>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-white rounded-3 p-3 mb-4 border shadow-sm">
-                            <h6 class="fw-bold text-primary small text-uppercase mb-2"><i class="fas fa-diagnoses me-2"></i>Relato Técnico / Avaria:</h6>
-                            <p class="mb-0 text-dark fw-500" style="font-size: 1.15rem; line-height: 1.4;">{{ os.descricao_avaria }}</p>
-                        </div>
+    <div class="row">
+        <div class="col-lg-12"> 
+            <ul class="nav nav-pills nav-pills-custom nav-fill" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="pills-waiting-tab" data-bs-toggle="pill" data-bs-target="#pills-waiting" type="button">FILA DE ENTRADA</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="pills-active-tab" data-bs-toggle="pill" data-bs-target="#pills-active" type="button">PRODUÇÃO</button>
+                </li>
+            </ul>
 
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="pills-waiting">
+                    {% for os in fila %}
+                    <div class="prod-card {% if os.prioridade == 'Urgente' %}card-urgente{% endif %}">
+                        <div class="prod-card-header" style="background: white;">
+                            <span class="plate-badge">{{ os.veiculo.placa }}</span>
+                            {% if os.prioridade == 'Urgente' %}
+                                <span class="badge bg-danger text-white fw-bold" style="font-size: 0.6rem;">INTERVENÇÃO IMEDIATA</span>
+                            {% else %}
+                                <span class="fw-800 text-muted" style="font-size: 0.7rem;">RECEBIDO: {{ os.data_abertura|timesince }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="mecanico-info">
+                            <div class="avatar-circle" style="background: #f1f5f9; color: var(--slate-700); border: 1px solid #e2e8f0;">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div>
+                                <span class="cell-label">Veículo / Serviço</span>
+                                <div class="fw-800">{{ os.veiculo.marca }} {{ os.veiculo.modelo }}</div>
+                                <div class="small text-primary fw-bold">{{ os.get_tipo_servico_display }}</div>
+                            </div>
+                        </div>
                         {% if os.status_pecas == 'vermelho' %}
-                            <button type="button" class="btn btn-secondary w-100 py-4 fs-3 fw-bold rounded-4 shadow disabled border-bottom border-4 border-dark opacity-75">
-                                <i class="fas fa-lock me-3"></i>BLOQUEADO: SEM STOCK
-                            </button>
+                        <div class="p-3 bg-light text-center text-danger fw-800 small border-top">ESTADO: A AGUARDAR PEÇAS</div>
                         {% else %}
-                            <button type="button" onclick="abrirModalAtribuicao('{{ os.id }}', '{{ os.veiculo.placa }}')" 
-                                    class="btn btn-dark w-100 py-4 fs-3 fw-bold rounded-4 shadow btn-touch border-bottom border-4 border-secondary">
-                                <i class="fas fa-play-circle me-3 text-warning"></i>INICIAR SERVIÇO
-                            </button>
+                        <button type="button" onclick="abrirModalAtribuicao('{{ os.id }}', '{{ os.veiculo.placa }}', '{% if os.prioridade == 'Urgente' %}top{% else %}normal{% endif %}')" 
+                                class="btn-work" style="background: {% if os.prioridade == 'Urgente' %}var(--danger-red){% else %}var(--primary-blue){% endif %};">
+                            {% if os.prioridade == 'Urgente' %}SERVIÇO URGENTE{% else %}INICIAR PROCESSO{% endif %} <i class="fas fa-play ms-2" style="font-size: 0.7rem;"></i>
+                        </button>
                         {% endif %}
                     </div>
+                    {% endfor %}
                 </div>
-                {% empty %}
-                <div class="text-center py-5 bg-light rounded-4 border border-dashed">
-                    <i class="fas fa-check-circle text-success fa-3x mb-3 opacity-25"></i>
-                    <p class="text-muted fw-bold">Tudo limpo! Sem veículos em espera.</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
 
-        <div class="col-12 col-xl-7">
-            <div class="d-flex align-items-center justify-content-between mb-3 px-2">
-                <div class="d-flex align-items-center">
-                    <div class="bg-primary text-white rounded-3 p-2 me-3 shadow"><i class="fas fa-gears"></i></div>
-                    <h5 class="fw-bold m-0 text-uppercase" style="letter-spacing: 1px;"> Em / Produção</h5>
-                </div>
-            </div>
-
-            <div class="row g-4">
-                {% for os in trabalhos_ativos %}
-                <div class="col-12">
-                    <div class="card border-0 shadow rounded-4 overflow-hidden card-active-glow" style="border: 2px solid #0d6efd !important;">
-                        <div class="row g-0">
-                            <div class="col-md-5 bg-white p-4 border-end">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge bg-success text-white border-0 rounded-pill px-3 py-2">
-                                        <i class="fas fa-spinner fa-spin me-2"></i>EM EXECUÇÃO
-                                    </span>
-                                    <small class="text-muted fw-bold">OS #{{ os.id }}</small>
-                                </div>
-                                <h1 class="display-3 fw-black text-dark mb-1" style="letter-spacing: -2px;">{{ os.veiculo.placa }}</h1>
-                                <h4 class="text-secondary fw-500 mb-4">{{ os.veiculo.marca }} {{ os.veiculo.modelo }}</h4>
-                                
-                                <div class="p-3 bg-light rounded-4 border shadow-sm">
-                                    <p class="text-muted small fw-bold mb-1">MECÂNICO RESPONSÁVEL</p>
-                                    <h4 class="mb-0 fw-black text-primary text-truncate">{{ os.mecanico.username|upper }}</h4>
-                                </div>
+                <div class="tab-pane fade" id="pills-active">
+                    {% for os in trabalhos_ativos %}
+                    <div class="prod-card">
+                        <div class="prod-card-header">
+                            <div class="fw-800 text-success" style="font-size: 0.7rem;">
+                                <i class="fas fa-circle-notch fa-spin me-1"></i> OPERAÇÃO ATIVA
                             </div>
-                            
-                            <div class="col-md-7 bg-white p-4 d-flex flex-column justify-content-between" style="background-image: linear-gradient(to right, #ffffff, #fafafa);">
-                                <div class="row text-center mb-4">
-                                    <div class="col-6 border-end">
-                                        <p class="text-muted small fw-bold mb-1">INÍCIO DO TRABALHO</p>
-                                        <h3 class="fw-bold text-dark">{{ os.data_atribuicao|date:"H:i" }}</h3>
-                                    </div>
-                                    <div class="col-6">
-                                        {% if os.tipo_servico == 'MANUTENCAO' %}
-                                            <p class="text-muted small fw-bold mb-1">PREVISÃO DE SAÍDA</p>
-                                            <h3 class="fw-bold text-primary">{{ os.hora_prevista_entrega|date:"H:i"|default:"--:--" }}</h3>
-                                        {% else %}
-                                            <p class="text-muted small fw-bold mb-1">TIPO DE SERVIÇO</p>
-                                            <h3 class="fw-bold text-danger" style="font-size: 1.2rem;">REPARAÇÃO CORRETIVA</h3>
-                                        {% endif %}
-                                    </div>
-                                </div>
+                            <div class="fw-900 text-dark" style="font-family: 'JetBrains Mono';">OS-{{ os.id }}</div>
+                        </div>
 
-                                <div class="mb-4 bg-light p-3 rounded-4 border">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span class="small fw-black text-muted text-uppercase">Progresso da Tarefa</span>
-                                        <span class="badge bg-primary">65%</span>
-                                    </div>
-                                    <div class="progress rounded-pill shadow-sm" style="height: 25px; background-color: #e9ecef;">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 65%;">
-                                            <span class="fw-bold small">65% CONCLUÍDO</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="d-grid">
-                                    <a href="{% url 'abrir_os_sessao' os.id %}" class="btn btn-outline-dark btn-lg py-3 fw-bold rounded-4 border-2 shadow-sm touch-action">
-                                        <i class="fas fa-folder-open me-2"></i>ABRIR FOLHA DE OBRA
-                                    </a>
-                                </div>
+                        <div class="mecanico-info">
+                            <div class="avatar-circle">{{ os.mecanico.username|slice:":1"|upper }}</div>
+                            <div>
+                                <span class="cell-label">Operador Técnico</span>
+                                <div class="fw-800 text-dark">{{ os.mecanico.username|upper }}</div>
                             </div>
                         </div>
+
+                        <div class="tech-progress-container">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="meta-label">Fase: {{ os.get_status_display }}</span>
+                                <span class="fw-900 text-success">
+                                    {% if os.status == 'DIAGNOSTICO' %}30%{% elif os.status == 'REPARACAO' %}70%{% elif os.status == 'TESTE_FINAL' %}90%{% else %}10%{% endif %}
+                                </span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: {% if os.status == 'DIAGNOSTICO' %}30%{% elif os.status == 'REPARACAO' %}70%{% elif os.status == 'TESTE_FINAL' %}90%{% else %}10%{% endif %}"></div>
+                            </div>
+                        </div>
+
+                        <div class="data-grid">
+                            <div class="data-cell"><span class="cell-label">Matrícula</span><div class="cell-value">{{ os.veiculo.placa }}</div></div>
+                            <div class="data-cell">
+                                <span class="cell-label">Início do Trabalho</span>
+                                <div class="cell-value text-primary">{{ os.data_atribuicao|date:"H:i" }}</div>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'abrir_os_sessao' os.id %}" class="btn-work">FICHA DE TRABALHO <i class="fas fa-terminal ms-2"></i></a>
                     </div>
+                    {% endfor %}
                 </div>
-                {% empty %}
-                <div class="col-12 text-center py-5 bg-white rounded-4 border-2 shadow-sm" style="border-style: dashed !important;">
-                    <h4 class="text-muted fw-bold m-0">Nenhuma baía de trabalho ativa no momento.</h4>
-                </div>
-                {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="modalMecanico" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-5">
-            <div class="p-4 text-center bg-dark text-white rounded-top-5">
-                <i class="fas fa-user-plus fa-2x mb-2 text-warning"></i>
-                <h3 class="mb-0 text-uppercase fw-bold">Check-In Técnico</h3>
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasInfo">
+    <div class="offcanvas-header border-bottom border-secondary">
+        <h5 class="offcanvas-title fw-800" style="font-size: 1rem; letter-spacing: 1px;">CENTRAL DE COMANDO</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        
+        <div class="mb-5">
+            <h6 class="meta-label mb-4 text-primary d-flex align-items-center">
+                <span class="status-indicator"></span> Equipa em Turno
+            </h6>
+            {% for mec in mecanicos %}
+            <div class="tech-status-card">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="tech-avatar">
+                        {{ mec.username|slice:":1"|upper }}
+                    </div>
+                    <div>
+                        <div class="fw-800 text-dark" style="font-size: 0.85rem;">{{ mec.username|upper }}</div>
+                        <div class="text-success fw-700" style="font-size: 0.65rem; text-transform: uppercase;">Disponível</div>
+                    </div>
+                </div>
+                <div class="badge bg-light text-muted border" style="font-size: 0.6rem;">ID #{{ mec.id }}</div>
             </div>
-            <div class="modal-body p-5 text-center bg-white">
+            {% endfor %}
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 bg-white mb-4">
+            <div class="card-body p-4">
+                <h6 class="meta-label mb-4 text-primary"><i class="fas fa-history me-2"></i>Diário da Oficina</h6>
+                <div class="activity-feed">
+                    {% for atividade in atividade_recente %}
+                    <div class="activity-item">
+                        <small class="text-muted d-block mb-1" style="font-size: 0.6rem;">{{ atividade.data_atribuicao|timesince }} atrás</small>
+                        <p class="small mb-0">
+                            <strong>{{ atividade.mecanico.username|upper }}</strong> assumiu a viatura 
+                            <span class="badge bg-light text-dark border">{{ atividade.veiculo.placa }}</span>
+                        </p>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-coffee text-muted mb-2"></i>
+                        <p class="x-small text-muted">Aguardando início de tarefas.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="modal fade" id="modalMecanico" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 24px; border: none;">
+            <div class="modal-body p-5">
+                <div class="text-center mb-4">
+                    <div class="h2 fw-900 text-dark" id="modal_placa">---</div>
+                    <p id="modal_subtitulo" class="text-muted fw-600">Alocação de Recurso</p>
+                </div>
                 <form action="{% url 'atribuir_mecanico' %}" method="POST">
                     {% csrf_token %}
                     <input type="hidden" name="os_id" id="modal_os_id">
-                    
-                    <p class="text-muted mb-1 fw-bold">VEÍCULO EM ATENDIMENTO</p>
-                    <h1 class="display-3 fw-black text-dark mb-4" id="modal_placa">---</h1>
-
-                    <div class="mb-4 text-start">
-                        <label class="form-label fw-bold text-dark fs-5">IDENTIFIQUE O TÉCNICO:</label>
-                        <select name="mecanico_id" class="form-select form-select-lg py-4 shadow-sm border-2 rounded-4" style="font-size: 1.4rem;" required>
-                            <option value="">Toque para selecionar...</option>
-                            {% for mec in mecanicos %}
-                            <option value="{{ mec.id }}">{{ mec.username|upper }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="d-grid gap-3 mt-5">
-                        <button type="submit" class="btn btn-success btn-lg py-4 fw-bold rounded-4 shadow-lg fs-4">
-                            <i class="fas fa-check-circle me-2"></i>CONFIRMAR E INICIAR
-                        </button>
-                        <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none" data-bs-dismiss="modal">VOLTAR ATRÁS</button>
-                    </div>
+                    <select name="mecanico_id" id="select_mecanico" class="form-select form-select-lg mb-4" style="height: 65px; border-radius: 15px; font-weight: 700;" required>
+                        <option value="">-- SELECCIONAR TÉCNICO --</option>
+                        {% for mec in mecanicos %}
+                        <option value="{{ mec.id }}">{{ mec.username|upper }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn-work" id="btn_confirmar_modal" style="background: var(--primary-blue); border-radius: 15px;">CONFIRMAR ALOCAÇÃO</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-    body { background-color: #ffffff !important; }
-    .fw-black { font-weight: 900; }
-    .btn-touch { transition: all 0.1s ease; }
-    .btn-touch:active { transform: scale(0.95); filter: brightness(0.8); }
-    .card-active-glow { animation: pulse-border 2s infinite; }
-    @keyframes pulse-border { 0% { border-color: #0d6efd; } 50% { border-color: #004085; } 100% { border-color: #0d6efd; } }
-    
-    .pulse-red { animation: pulse-red-bg 1.5s infinite; }
-    @keyframes pulse-red-bg {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); background-color: #b91c1c; }
-        100% { transform: scale(1); }
-    }
-
-    .scroll-container::-webkit-scrollbar { width: 8px; }
-    .scroll-container::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
-    .pulse-green .dot { width: 10px; height: 10px; background-color: #22c55e; border-radius: 50%; display: inline-block; animation: blink 1.5s infinite; }
-    @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-</style>
-
 <script>
     function updateClock() {
-        const el = document.getElementById('clock');
-        if(el) el.textContent = new Date().toLocaleTimeString('pt-PT', { hour12: false });
+        const now = new Date();
+        document.getElementById('digital-clock').textContent = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(updateClock, 1000); updateClock();
 
-    function abrirModalAtribuicao(id, placa) {
+    function abrirModalAtribuicao(id, placa, prioridade) {
         document.getElementById('modal_os_id').value = id;
         document.getElementById('modal_placa').innerText = placa;
-        var myModal = new bootstrap.Modal(document.getElementById('modalMecanico'));
-        myModal.show();
-    }
-
-    let refreshTimer = setInterval(autoRefresh, 15000);
-    function autoRefresh() {
-        if (!document.querySelector('.modal.show')) window.location.reload();
+        const sub = document.getElementById('modal_subtitulo');
+        const btn = document.getElementById('btn_confirmar_modal');
+        
+        if(prioridade === 'top') {
+            sub.innerHTML = '<span class="text-danger">⚠️ PRIORIDADE: INTERVENÇÃO IMEDIATA</span>';
+            btn.style.background = 'var(--danger-red)';
+        } else {
+            sub.innerText = 'Alocação de Recurso Técnico';
+            btn.style.background = 'var(--primary-blue)';
+        }
+        
+        new bootstrap.Modal(document.getElementById('modalMecanico')).show();
     }
 </script>
 {% endblock %}

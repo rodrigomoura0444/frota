@@ -18,16 +18,20 @@
                     <tr>
                         <th class="ps-4">Nº OS</th>
                         <th>Viatura</th>
-                        <th>Tipo</th>
-                        <th>Status Operacional</th>
+                        <th>Tipo / Prioridade</th> <th>Status Operacional</th>
                         <th>Custo Total</th>
                         <th class="text-center pe-4">Ação</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for os in ordens %}
-                    <tr>
-                        <td class="ps-4 fw-bold">#{{ os.numero_os|default:os.id }}</td>
+                    <tr {% if os.prioridade == 'Urgente' %}style="background-color: rgba(220, 53, 69, 0.02);"{% endif %}>
+                        <td class="ps-4 fw-bold">
+                            #{{ os.numero_os|default:os.id }}
+                            {% if os.prioridade == 'Urgente' %}
+                                <i class="fas fa-bolt text-danger ms-1" title="Pista Rápida"></i>
+                            {% endif %}
+                        </td>
                         <td>
                             <div class="d-flex flex-column">
                                 <span class="fw-bold text-dark">{{ os.veiculo.placa }}</span>
@@ -35,11 +39,22 @@
                             </div>
                         </td>
                         <td>
-                             {% if os.tipo_servico == 'PREVENTIVA' %}
-                                <span class="badge bg-soft-info text-info"><i class="fas fa-history me-1"></i>Prev.</span>
-                            {% else %}
-                                <span class="badge bg-soft-danger text-danger"><i class="fas fa-wrench me-1"></i>Corr.</span>
-                            {% endif %}
+                            <div class="d-flex flex-column gap-1">
+                                <div>
+                                    {% if os.tipo_servico == 'MANUTENCAO' %}
+                                        <span class="badge bg-soft-info text-info" style="font-size: 0.7rem;"><i class="fas fa-history me-1"></i>Prev.</span>
+                                    {% else %}
+                                        <span class="badge bg-soft-danger text-danger" style="font-size: 0.7rem;"><i class="fas fa-wrench me-1"></i>Corr.</span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if os.prioridade == 'Urgente' %}
+                                        <span class="badge bg-danger text-white" style="font-size: 0.65rem; letter-spacing: 0.5px;">URGENTE</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted border" style="font-size: 0.65rem;">Normal</span>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </td>
                         <td>
                             <span class="badge rounded-pill px-3 
@@ -51,9 +66,14 @@
                         </td>
                         <td class="fw-bold text-dark">{{ os.total_geral|floatformat:2 }} €</td>
                         <td class="text-center pe-4">
-                            <a href="{% url 'gerar_pdf_os' os.id %}" class="btn btn-outline-danger btn-sm shadow-sm">
-                                <i class="fas fa-file-pdf me-1"></i> Gerar PDF
-                            </a>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{% url 'detalhe_os' os.id %}" class="btn btn-outline-primary btn-sm shadow-sm" title="Abrir Folha de Obra">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'gerar_pdf_os' os.id %}" class="btn btn-outline-danger btn-sm shadow-sm" title="Gerar PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
@@ -68,5 +88,7 @@
 <style>
     .bg-soft-info { background: rgba(13, 202, 240, 0.1); }
     .bg-soft-danger { background: rgba(220, 53, 69, 0.1); }
+    /* Efeito de destaque para linhas urgentes ao passar o rato */
+    tr:hover { background-color: rgba(0,0,0,0.02) !important; }
 </style>
 {% endblock %}

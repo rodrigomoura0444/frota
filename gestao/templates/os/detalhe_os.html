@@ -4,7 +4,7 @@
 <div class="container-fluid py-4 min-vh-100" style="background-color: #f0f2f5; font-family: 'Inter', sans-serif;">
     
     <header class="row mb-4 px-3">
-        <div class="col-12 p-4 rounded-4 shadow-sm bg-white border-start border-primary border-5 d-flex justify-content-between align-items-center">
+        <div class="col-12 p-4 rounded-4 shadow-sm bg-white border-start {% if os.prioridade == 'Urgente' %}border-danger{% else %}border-primary{% endif %} border-5 d-flex justify-content-between align-items-center">
             <div>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-1">
@@ -12,15 +12,30 @@
                         <li class="breadcrumb-item active small fw-300" aria-current="page">Folha de Obra</li>
                     </ol>
                 </nav>
-                <h2 class="fw-300 text-dark mb-0" style="letter-spacing: -1px;">Folha de Trabalho <span class="fw-500 text-primary">#{{ os.numero_os|default:os.id }}</span></h2>
+                <div class="d-flex align-items-center gap-3">
+                    <h2 class="fw-300 text-dark mb-0" style="letter-spacing: -1px;">Folha de Trabalho <span class="fw-500 text-primary">#{{ os.numero_os|default:os.id }}</span></h2>
+                    {% if os.prioridade == 'Urgente' %}
+                        <span class="badge bg-danger rounded-pill px-3 py-2 fw-600 animate-pulse">
+                            <i class="fas fa-bolt me-1"></i> PISTA RÁPIDA
+                        </span>
+                    {% endif %}
+                </div>
             </div>
             <div class="text-end">
-                <span class="badge {% if os.status == 'REPARACAO' %}bg-warning-subtle text-warning-emphasis border-warning-subtle{% else %}bg-success-subtle text-success border-success-subtle{% endif %} border px-3 py-2 rounded-pill fw-500 shadow-sm">
-                    <i class="fas {% if os.status == 'REPARACAO' %}fa-tools{% else %}fa-check{% endif %} me-2 small"></i>{{ os.get_status_display }}
+                <span class="badge {% if os.status == 'FINALIZADO' %}bg-success-subtle text-success border-success-subtle{% else %}bg-warning-subtle text-warning-emphasis border-warning-subtle{% endif %} border px-3 py-2 rounded-pill fw-500 shadow-sm">
+                    <i class="fas {% if os.status == 'FINALIZADO' %}fa-check{% else %}fa-tools{% endif %} me-2 small"></i>{{ os.get_status_display }}
                 </span>
             </div>
         </div>
     </header>
+
+    {% if os.prioridade == 'Urgente' and os.status != 'FINALIZADO' %}
+    <div class="row mb-4 px-3">
+        <div class="col-12 bg-danger text-white p-2 rounded-3 text-center fw-bold shadow-sm" style="letter-spacing: 1px; font-size: 0.8rem;">
+            <i class="fas fa-exclamation-triangle me-2"></i> ATENÇÃO: ESTE VEÍCULO TEM PRIORIDADE DE SAÍDA IMEDIATA <i class="fas fa-exclamation-triangle ms-2"></i>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
         <div class="card-body p-4 p-lg-5">
@@ -35,19 +50,25 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="p-4 bg-light rounded-4 border-start border-danger border-3 h-100">
-                        <h6 class="x-small text-muted fw-500 text-uppercase tracking-wider mb-2">Solicitação de Serviço</h6>
+                    <div class="p-4 bg-light rounded-4 border-start {% if os.prioridade == 'Urgente' %}border-danger{% else %}border-dark{% endif %} border-3 h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h6 class="x-small text-muted fw-500 text-uppercase tracking-wider mb-2">Solicitação de Serviço</h6>
+                            <span class="badge {% if os.prioridade == 'Urgente' %}bg-danger{% else %}bg-secondary{% endif %} x-small fw-600">
+                                {{ os.prioridade|upper }}
+                            </span>
+                        </div>
                         <p class="mb-2 text-dark fw-500">{{ os.get_tipo_servico_display }}</p>
-                        <div class="p-2 bg-white rounded-3 border border-danger-subtle">
-                            <p class="text-danger mb-0 small fw-300"><strong>Reclamação:</strong> {{ os.descricao_avaria }}</p>
+                        <div class="p-2 bg-white rounded-3 border border-light-subtle">
+                            <p class="text-dark mb-0 small fw-300"><strong>Reclamação:</strong> {{ os.descricao_avaria }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {% if os.status == 'REPARACAO' %}
+            {% if os.status != 'FINALIZADO' %}
             <form action="{% url 'finalizar_os' %}" method="POST" id="formOS">
                 {% csrf_token %}
+                <input type="hidden" name="os_id" value="{{ os.id }}">
                 
                 <div class="row mb-5 g-4">
                     <div class="col-lg-7">
@@ -56,7 +77,7 @@
                         </label>
                         <textarea name="diagnostico_tecnico" class="form-control border-light-subtle rounded-4 p-4 fw-300 shadow-sm" 
                                   rows="9" style="background-color: #fafbfc;" 
-                                  placeholder="Descreva detalhadamente a intervenção...">{{ os.diagnostico_tecnico|default:'' }}</textarea>
+                                  placeholder="Descreva detalhadamente a intervenção..." required>{{ os.diagnostico_tecnico|default:'' }}</textarea>
                     </div>
 
                     <div class="col-lg-5">
@@ -66,20 +87,20 @@
                         <div class="p-4 border border-light-subtle rounded-4 bg-white shadow-sm">
                             <div class="row g-2 mb-4">
                                 <div class="col-3">
-                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h05" value="0.5" {% if os.horas_mao_de_obra == 0.5 %}checked{% endif %}>
-                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h05">0.5h</label>
+                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h1" value="0.5" {% if os.horas_mao_de_obra|stringformat:".1f" == "0.5" %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h1">0.5h</label>
                                 </div>
                                 <div class="col-3">
-                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h10" value="1.0" {% if os.horas_mao_de_obra == 1.0 %}checked{% endif %}>
-                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h10">1.0h</label>
+                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h2" value="1.0" {% if os.horas_mao_de_obra|stringformat:".1f" == "1.0" %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h2">1.0h</label>
                                 </div>
                                 <div class="col-3">
-                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h15" value="1.5" {% if os.horas_mao_de_obra == 1.5 %}checked{% endif %}>
-                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h15">1.5h</label>
+                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h3" value="1.5" {% if os.horas_mao_de_obra|stringformat:".1f" == "1.5" %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h3">1.5h</label>
                                 </div>
                                 <div class="col-3">
-                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h20" value="2.0" {% if os.horas_mao_de_obra == 2.0 %}checked{% endif %}>
-                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h20">2.0h</label>
+                                    <input type="radio" class="btn-check" name="horas_mao_de_obra" id="h4" value="2.0" {% if os.horas_mao_de_obra|stringformat:".1f" == "2.0" %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 fw-300 py-2 border-light-subtle small" for="h4">2.0h</label>
                                 </div>
                             </div>
                             <div class="text-center bg-primary-subtle py-2 rounded-3">
@@ -111,7 +132,7 @@
                                         <input type="text" name="marca_{{ item.id }}" value="{{ item.marca|default:'' }}" class="form-control form-control-sm border-light-subtle fw-300" placeholder="Marca...">
                                     </td>
                                     <td>
-                                        <input type="number" step="0.1" name="qtd_{{ item.id }}" value="{{ item.quantidade|floatformat:1 }}" class="form-control form-control-sm text-center border-light-subtle fw-300">
+                                        <input type="number" step="0.1" name="qtd_{{ item.id }}" value="{{ item.quantidade|safe }}" class="form-control form-control-sm text-center border-light-subtle fw-300">
                                     </td>
                                     <td class="text-center">
                                         <div class="form-check form-switch d-inline-block">
@@ -143,7 +164,7 @@
                                 <input type="number" step="0.1" name="nova_peca_qtd" class="form-control border-0 shadow-sm text-center fw-300 py-2" value="1">
                             </div>
                             <div class="col-6 col-md-2">
-                                <button type="submit" name="botao_finalizar_extra" value="false" class="btn btn-warning w-100 fw-500 shadow-sm border-0 py-2">
+                                <button type="submit" name="botao_finalizar" value="false" class="btn btn-warning w-100 fw-500 shadow-sm border-0 py-2">
                                     <i class="fas fa-plus small"></i> ADD
                                 </button>
                             </div>
@@ -161,12 +182,13 @@
                         </button>
                     </div>
                     <div class="col-md-5">
-                        <button type="button" onclick="confirmarFecho()" class="btn btn-success w-100 py-3 fw-500 rounded-3 shadow-green border-0">
+                        <button type="submit" name="botao_finalizar" value="true" 
+                                class="btn {% if os.prioridade == 'Urgente' %}btn-danger{% else %}btn-success{% endif %} w-100 py-3 fw-500 rounded-3 shadow-green border-0"
+                                onclick="return confirm('Deseja finalizar a reparação? O cliente receberá notificação imediata.')">
                             <i class="fas fa-check-double me-2"></i>FINALIZAR TRABALHO
                         </button>
                     </div>
                 </div>
-                <input type="hidden" name="botao_finalizar" id="inputFinalizar" value="false">
             </form>
             
             {% else %}
@@ -204,18 +226,17 @@
     .text-warning-emphasis { color: #92400e !important; }
     .border-dashed { border: 2px dashed #cbd5e1 !important; }
     .shadow-green { box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.25); }
+    .animate-pulse { animation: pulse 2s infinite; }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+
     .btn-outline-primary { border-color: #f1f5f9; color: #64748b; background: #fff; }
     .btn-check:checked + .btn-outline-primary { background-color: #0d6efd !important; border-color: #0d6efd !important; color: #fff !important; }
     .form-control:focus { box-shadow: none; border-color: #0d6efd; }
     .breadcrumb-item + .breadcrumb-item::before { content: "→"; color: #cbd5e1; }
 </style>
-
-<script>
-    function confirmarFecho() {
-        if (confirm("Deseja finalizar a reparação? Certifique-se que registou todas as peças. O cliente receberá um e-mail automático.")) {
-            document.getElementById('inputFinalizar').value = "true";
-            document.getElementById('formOS').submit();
-        }
-    }
-</script>
 {% endblock %}
