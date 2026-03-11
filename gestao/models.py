@@ -33,6 +33,7 @@ class PecaStock(models.Model):
     class Meta:
         verbose_name = "Peça em Stock"
         verbose_name_plural = "Peças em Stock"
+        
 
     def __str__(self):
         return f"{self.nome} (Ref: {self.referencia}) - Qtd: {self.quantidade_em_stock}"
