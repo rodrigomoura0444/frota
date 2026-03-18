@@ -31,7 +31,7 @@ urlpatterns = [
     
     # Finaliza uma OS
     path('os/finalizar/', views.finalizar_os, name='finalizar_os'),
-    
+    path("/", .as_view(), name="")
     # Lista de clientes/veículos
     path('clientes/', views.clientes, name='clientes'),
     

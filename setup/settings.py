@@ -12,7 +12,7 @@ SECRET_KEY = 'django-insecure-$t_)%n6sl9g-v9vgziw4dtw)s9$^1)s)obu)fy!m)(fyrkkky*
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['172.20.10.14', '172.16.192.165', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['172.20.10.14', '172.16.192.165', '127.0.0.1', 'localhost', 'oficinamesh.pt'] # Adicionei os IPS locais e um possível dominio para produção
                                                                                                                                                                                                                                                                                                         
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -85,7 +85,7 @@ USE_TZ = True
 
 
 # --- CONFIGURAÇÃO DE FICHEIROS ESTÁTICOS E MEDIA ---
-
+STATIC_URL = 'static/'
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",          
@@ -126,5 +126,6 @@ CSRF_TRUSTED_ORIGINS = [
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'dashboard' 
 LOGIN_URL = '/admin/login/'
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
